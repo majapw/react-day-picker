@@ -1,6 +1,8 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component, PropTypes } from 'react/addons';
 import moment from 'moment';
 import { weeks } from './CalendarUtils';
+
+const ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
 
 class DayPicker extends Component {
 
@@ -38,7 +40,8 @@ class DayPicker extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      month: this.props.initialMonth.clone()
+      month: this.props.initialMonth.clone(),
+      transition: ''
     };
   }
 
@@ -70,7 +73,7 @@ class DayPicker extends Component {
     e.persist();
     const { month } = this.state;
     const nextMonth = month.clone().add(1, 'month');
-    this.setState({ month: nextMonth }, () => {
+    this.setState({ month: nextMonth, transition: 'next' }, () => {
       if (this.props.onNextMonthClick) {
         this.props.onNextMonthClick(this.state.month, e);
       }
@@ -81,7 +84,7 @@ class DayPicker extends Component {
     e.persist();
     const { month } = this.state;
     const prevMonth = month.clone().subtract(1, 'month');
-    this.setState({ month: prevMonth }, () => {
+    this.setState({ month: prevMonth, transition: 'previous' }, () => {
       if (this.props.onPrevMonthClick) {
         this.props.onPrevMonthClick(this.state.month, e);
       }
@@ -120,7 +123,11 @@ class DayPicker extends Component {
 
     return (
       <div className={this.props.className} style={this.props.style}>
-        {months}
+        <ReactCSSTransitionGroup transitionName="example" className={this.state.transition}>
+          <div key={month.format('MM-YY')} className="transition-container">
+            {months}
+          </div>
+        </ReactCSSTransitionGroup>
       </div>
     );
   }

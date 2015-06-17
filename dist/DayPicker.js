@@ -14,9 +14,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; }
 
-var _react = require('react');
+var _reactAddons = require('react/addons');
 
-var _react2 = _interopRequireDefault(_react);
+var _reactAddons2 = _interopRequireDefault(_reactAddons);
 
 var _moment = require('moment');
 
@@ -24,13 +24,16 @@ var _moment2 = _interopRequireDefault(_moment);
 
 var _CalendarUtils = require('./CalendarUtils');
 
+var ReactCSSTransitionGroup = _reactAddons2['default'].addons.CSSTransitionGroup;
+
 var DayPicker = (function (_Component) {
   function DayPicker(props) {
     _classCallCheck(this, DayPicker);
 
     _get(Object.getPrototypeOf(DayPicker.prototype), 'constructor', this).call(this, props);
     this.state = {
-      month: this.props.initialMonth.clone()
+      month: this.props.initialMonth.clone(),
+      transition: ''
     };
   }
 
@@ -73,7 +76,7 @@ var DayPicker = (function (_Component) {
       var month = this.state.month;
 
       var nextMonth = month.clone().add(1, 'month');
-      this.setState({ month: nextMonth }, function () {
+      this.setState({ month: nextMonth, transition: 'next' }, function () {
         if (_this.props.onNextMonthClick) {
           _this.props.onNextMonthClick(_this.state.month, e);
         }
@@ -88,7 +91,7 @@ var DayPicker = (function (_Component) {
       var month = this.state.month;
 
       var prevMonth = month.clone().subtract(1, 'month');
-      this.setState({ month: prevMonth }, function () {
+      this.setState({ month: prevMonth, transition: 'previous' }, function () {
         if (_this2.props.onPrevMonthClick) {
           _this2.props.onPrevMonthClick(_this2.state.month, e);
         }
@@ -129,10 +132,18 @@ var DayPicker = (function (_Component) {
         month = month.clone().add(1, 'month');
       }
 
-      return _react2['default'].createElement(
+      return _reactAddons2['default'].createElement(
         'div',
         { className: this.props.className, style: this.props.style },
-        months
+        _reactAddons2['default'].createElement(
+          ReactCSSTransitionGroup,
+          { transitionName: 'example', className: this.state.transition },
+          _reactAddons2['default'].createElement(
+            'div',
+            { key: month.format('MM-YY'), className: 'transition-container' },
+            months
+          )
+        )
       );
     }
   }, {
@@ -140,22 +151,22 @@ var DayPicker = (function (_Component) {
     value: function renderMonth(month, monthIndex) {
       var isFirstMonth = month === this.state.month;
       var isLastMonth = monthIndex === this.props.numberOfMonths - 1;
-      return _react2['default'].createElement(
+      return _reactAddons2['default'].createElement(
         'table',
         { key: monthIndex, className: 'DayPicker' },
-        _react2['default'].createElement(
+        _reactAddons2['default'].createElement(
           'caption',
           { className: 'DayPicker-caption' },
           isFirstMonth && this.renderNavButton('left'),
           month.format('MMMM YYYY'),
           isLastMonth && this.renderNavButton('right')
         ),
-        _react2['default'].createElement(
+        _reactAddons2['default'].createElement(
           'thead',
           null,
           this.renderWeekHeader()
         ),
-        _react2['default'].createElement(
+        _reactAddons2['default'].createElement(
           'tbody',
           null,
           this.renderWeeks(month)
@@ -168,7 +179,7 @@ var DayPicker = (function (_Component) {
       var className = 'DayPicker-nav DayPicker-nav--' + position;
       var handler = position === 'left' ? this.handlePrevMonthClick : this.handleNextMonthClick;
 
-      return _react2['default'].createElement('span', { ref: 'btn-' + position, className: className,
+      return _reactAddons2['default'].createElement('span', { ref: 'btn-' + position, className: className,
         style: { float: position }, onClick: handler.bind(this) });
     }
   }, {
@@ -177,7 +188,7 @@ var DayPicker = (function (_Component) {
       var _this3 = this;
 
       return (0, _CalendarUtils.weeks)(month).map(function (week, i) {
-        return _react2['default'].createElement(
+        return _reactAddons2['default'].createElement(
           'tr',
           { key: i, className: 'DayPicker-week' },
           _this3.renderDays(week)
@@ -189,7 +200,7 @@ var DayPicker = (function (_Component) {
     value: function renderWeekHeader() {
       var header = [];
       for (var i = 0; i < 7; i++) {
-        header.push(_react2['default'].createElement(
+        header.push(_reactAddons2['default'].createElement(
           'th',
           { key: i, className: 'DayPicker-weekday' },
           (0, _moment2['default'])().weekday(i).format('dd')
@@ -235,7 +246,7 @@ var DayPicker = (function (_Component) {
       }
 
       if (outside && !this.props.enableOutsideDays) {
-        return _react2['default'].createElement('td', { className: className, ref: key, key: key });
+        return _reactAddons2['default'].createElement('td', { className: className, ref: key, key: key });
       } else {
         var modifiers = this.getModifiersForDay(day);
         if (outside) {
@@ -244,7 +255,7 @@ var DayPicker = (function (_Component) {
         className += modifiers.map(function (mod) {
           return ' DayPicker-day--' + mod;
         }).join('');
-        return _react2['default'].createElement(
+        return _reactAddons2['default'].createElement(
           'td',
           { ref: key, key: key,
             className: className,
@@ -260,26 +271,26 @@ var DayPicker = (function (_Component) {
     key: 'propTypes',
     value: {
 
-      enableOutsideDays: _react.PropTypes.bool,
+      enableOutsideDays: _reactAddons.PropTypes.bool,
 
       // default is current month
-      initialMonth: _react.PropTypes.object,
+      initialMonth: _reactAddons.PropTypes.object,
 
       // default is 1
-      numberOfMonths: _react.PropTypes.number,
+      numberOfMonths: _reactAddons.PropTypes.number,
 
-      modifiers: _react.PropTypes.object,
+      modifiers: _reactAddons.PropTypes.object,
 
-      onDayClick: _react.PropTypes.func,
+      onDayClick: _reactAddons.PropTypes.func,
 
       // requires react-tap-event-plugin
-      onDayTouchTap: _react.PropTypes.func,
+      onDayTouchTap: _reactAddons.PropTypes.func,
 
-      onDayMouseEnter: _react.PropTypes.func,
-      onDayMouseLeave: _react.PropTypes.func,
+      onDayMouseEnter: _reactAddons.PropTypes.func,
+      onDayMouseLeave: _reactAddons.PropTypes.func,
 
-      onNextMonthClick: _react.PropTypes.func,
-      onPrevMonthClick: _react.PropTypes.func
+      onNextMonthClick: _reactAddons.PropTypes.func,
+      onPrevMonthClick: _reactAddons.PropTypes.func
 
     },
     enumerable: true
@@ -294,7 +305,7 @@ var DayPicker = (function (_Component) {
   }]);
 
   return DayPicker;
-})(_react.Component);
+})(_reactAddons.Component);
 
 exports['default'] = DayPicker;
 module.exports = exports['default'];
